@@ -7,6 +7,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "Camera.h"
 #include "Common.h"
 #include "Image.h"
 #include "Math/Ray.h"
@@ -28,6 +29,13 @@ Color rayColor(const Ray& ray, const Hittable& world) {
     return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
+namespace Settings {
+
+const bool ANTIALIASING_ENABLED = true;
+const auto ANTIALIAS_SAMPLES_PER_PIXEL = 100;
+
+} // namespace Settings
+
 int main(int argc, char* argv[]) {
     std::cout << "Świeć promyczku świeć!" << std::endl;
 
@@ -46,6 +54,8 @@ int main(int argc, char* argv[]) {
     auto vertical = Vec3(0, viewportHeight, 0);  // vertical full edge
     auto lowerLeftCorner = origin - (horizontal / 2) - (vertical / 2) - Vec3(0, 0, focal_length);
 
+    Camera camera(viewportWidth, viewportHeight);
+
     Image testImage(imageWidth, imageHeight);
 
     // World
@@ -56,17 +66,24 @@ int main(int argc, char* argv[]) {
     for (int y = imageHeight - 1; y >= 0; y--) {
         std::cout << "Rows remaining: " << y << std::endl;
         for (int x = 0; x < imageWidth; x++) {
-            auto u = double(x + 0.5) / (imageWidth - 1);
-            auto v = double(y + 0.5) / (imageHeight - 1);
-            Ray ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
-            Color pixelColor = rayColor(ray, world);
+            auto samplesCount = Settings::ANTIALIAS_SAMPLES_PER_PIXEL;
+            if (!Settings::ANTIALIASING_ENABLED) {
+                samplesCount = 1;
+            }
+            Color accumulatedPixelColor(0.0, 0.0, 0.0);
+            for (auto i{0}; i < samplesCount; i++) {
+                auto u = double(x + randomDouble()) / (imageWidth - 1);  // x in <0,1> range
+                auto v = double(y + randomDouble()) / (imageHeight - 1); // y in <0,1> range
+                auto ray = camera.getRay(u, v);
+                accumulatedPixelColor += rayColor(ray, world);
+            }
+            auto pixelColor = accumulatedPixelColor / samplesCount;
 
             testImage(x, y) = pixelColor;
         }
     }
 
     stbi_write_png(filename, imageWidth, imageHeight, 3, testImage.getData(), 0);
-    // stbi_write_bmp("/home/piotr/repos/Promyczek/test.bmp", width, height, 3, testImage.getData());
 
     Viewer(filename, imageWidth, imageHeight).run();
 }

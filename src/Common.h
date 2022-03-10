@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <limits>
+#include <random>
 
 namespace Consts {
 
@@ -12,6 +13,12 @@ const double Pi = 3.1415926535897932385;
 
 inline double degreesToRadians(double degrees) {
     return degrees * Consts::Pi / 180.0;
+}
+
+inline double randomDouble() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator;
+    return distribution(generator);
 }
 
 #endif
