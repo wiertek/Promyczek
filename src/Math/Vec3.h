@@ -102,7 +102,7 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
                 u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
-inline Vec3 unit_vector(Vec3 v) {
+inline Vec3 unitVector(Vec3 v) {
     return v / v.length();
 }
 

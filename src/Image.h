@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <initializer_list>
 #include <vector>
 
 #include "Math/Vec3.h"
@@ -20,6 +21,21 @@ class PixelSpan {
     }
 
     void set(Color color) {
+        *_iter = 255.999 * color.x();
+        *(_iter + 1) = 255.999 * color.y();
+        *(_iter + 2) = 255.999 * color.z();
+    }
+
+    void operator=(std::initializer_list<int> rgb) {
+        assert(rgb.size() == 3);
+        auto offset = 0;
+        for (auto&& colorComponent : rgb) {
+            *(_iter + offset) = colorComponent;
+            offset++;
+        }
+    }
+
+    void operator=(Color color) {
         *_iter = 255.999 * color.x();
         *(_iter + 1) = 255.999 * color.y();
         *(_iter + 2) = 255.999 * color.z();
