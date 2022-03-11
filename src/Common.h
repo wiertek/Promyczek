@@ -15,10 +15,12 @@ inline double degreesToRadians(double degrees) {
     return degrees * Consts::Pi / 180.0;
 }
 
-inline double randomDouble() {
+inline double randomDouble(double min = 0.0, double max = 1.0) {
+    double range = max - min;
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     static std::mt19937 generator;
-    return distribution(generator);
+    auto result = distribution(generator);
+    return result * range + min;
 }
 
 #endif

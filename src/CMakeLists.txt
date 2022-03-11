@@ -9,7 +9,7 @@ link_directories(${GTK3_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAGS_OTHER})
 
 
-set(SOURCES Main.cpp Image.cpp Viewer/Viewer.cpp Model/Sphere.cpp)
+set(SOURCES Main.cpp Image.cpp Viewer/Viewer.cpp Math/Vec3.cpp Model/Sphere.cpp)
   
 add_executable(PromyczekRenderer ${SOURCES}) 
 target_compile_features(PromyczekRenderer PUBLIC cxx_std_20)

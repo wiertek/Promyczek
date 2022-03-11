@@ -2,9 +2,9 @@
 
 bool Sphere::hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const {
     Vec3 oc = ray.origin() - _center;
-    auto a = ray.direction().length_squared();
+    auto a = ray.direction().lengthSquared();
     auto half_b = dot(oc, ray.direction());
-    auto c = oc.length_squared() - _radius * _radius;
+    auto c = oc.lengthSquared() - _radius * _radius;
 
     auto discriminant = half_b * half_b - a * c;
     if (discriminant < 0)

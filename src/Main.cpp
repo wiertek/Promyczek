@@ -19,10 +19,16 @@
 
 auto filename = "/home/piotr/repos/Promyczek/test.png";
 
-Color rayColor(const Ray& ray, const Hittable& world) {
+Color rayColor(const Ray& ray, const Hittable& world, int depth) {
+    if (depth <= 0) {
+        return Color(0, 0, 0);
+    }
+
     HitEvent hitEvent;
-    if (world.hit(ray, 0, Consts::Infinity, hitEvent)) {
-        return 0.5 * (hitEvent.normal + Color(1, 1, 1));
+    if (world.hit(ray, 0.001, Consts::Infinity, hitEvent)) {
+
+        Point3 target = hitEvent.point + randomInHemisphere(hitEvent.normal);
+        return 0.5 * rayColor(Ray(hitEvent.point, target - hitEvent.point), world, depth - 1);
     }
     Vec3 unitDirection = unitVector(ray.direction());
     auto t = 0.5 * (unitDirection.y() + 1.0);
@@ -33,6 +39,8 @@ namespace Settings {
 
 const bool ANTIALIASING_ENABLED = true;
 const auto ANTIALIAS_SAMPLES_PER_PIXEL = 100;
+const auto MAX_RAY_DEPTH = 50;
+const auto GAMMA_CORRECTION = 2.0;
 
 } // namespace Settings
 
@@ -75,9 +83,14 @@ int main(int argc, char* argv[]) {
                 auto u = double(x + randomDouble()) / (imageWidth - 1);  // x in <0,1> range
                 auto v = double(y + randomDouble()) / (imageHeight - 1); // y in <0,1> range
                 auto ray = camera.getRay(u, v);
-                accumulatedPixelColor += rayColor(ray, world);
+                accumulatedPixelColor += rayColor(ray, world, Settings::MAX_RAY_DEPTH);
             }
-            auto pixelColor = accumulatedPixelColor / samplesCount;
+            auto pixelColor = Color(std::pow(accumulatedPixelColor.x() / static_cast<double>(samplesCount),
+                                             1.0 / Settings::GAMMA_CORRECTION),
+                                    std::pow(accumulatedPixelColor.y() / static_cast<double>(samplesCount),
+                                             1.0 / Settings::GAMMA_CORRECTION),
+                                    std::pow(accumulatedPixelColor.z() / static_cast<double>(samplesCount),
+                                             1.0 / Settings::GAMMA_CORRECTION));
 
             testImage(x, y) = pixelColor;
         }
