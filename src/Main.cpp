@@ -14,6 +14,7 @@
 #include "Math/Vec3.h"
 #include "Model/Hittable.h"
 #include "Model/HittableList.h"
+#include "Model/Material.h"
 #include "Model/Sphere.h"
 #include "Viewer/Viewer.h"
 
@@ -27,8 +28,12 @@ Color rayColor(const Ray& ray, const Hittable& world, int depth) {
     HitEvent hitEvent;
     if (world.hit(ray, 0.001, Consts::Infinity, hitEvent)) {
 
-        Point3 target = hitEvent.point + randomInHemisphere(hitEvent.normal);
-        return 0.5 * rayColor(Ray(hitEvent.point, target - hitEvent.point), world, depth - 1);
+        Ray scattered;
+        Color attenuation;
+        if (hitEvent.material->scatter(ray, hitEvent, attenuation, scattered)) {
+            return attenuation * rayColor(scattered, world, depth - 1);
+        }
+        return Color(0, 0, 0);
     }
     Vec3 unitDirection = unitVector(ray.direction());
     auto t = 0.5 * (unitDirection.y() + 1.0);
@@ -68,8 +73,16 @@ int main(int argc, char* argv[]) {
 
     // World
     HittableList world;
-    world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-    world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+    auto material_ground = std::make_shared<Lambertian>(Color(16 / 255.0, 145.0 / 255.0, 12 / 255.0));
+    auto material_center = std::make_shared<Lambertian>(Color(251.0 / 255, 0.0, 1.0));
+    // auto material_left = std::make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
+    auto material_right = std::make_shared<Metal>(Color(10 / 255.0, 214 / 255.0, 1.0), 1.0);
+    auto material_left = std::make_shared<Dielectric>(1.5);
+
+    world.add(make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add(make_shared<Sphere>(Point3(0.0, 0.0, -1.0), 0.5, material_center));
+    world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_right));
 
     for (int y = imageHeight - 1; y >= 0; y--) {
         std::cout << "Rows remaining: " << y << std::endl;

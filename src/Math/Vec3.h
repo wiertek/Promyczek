@@ -53,6 +53,12 @@ class Vec3 {
         return sqrt(lengthSquared());
     }
 
+    bool isNearZero() const {
+        // Return true if the vector is close to zero in all dimensions.
+        const auto s = 1e-8;
+        return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+    }
+
     double lengthSquared() const {
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
@@ -117,5 +123,7 @@ inline Vec3 unitVector(Vec3 v) {
 Vec3 randomInUnitSphere();
 Vec3 randomUnitVector();
 Vec3 randomInHemisphere(const Vec3& normal);
+Vec3 reflect(const Vec3& v, const Vec3& n);
+Vec3 refract(const Vec3& uv, const Vec3& n, double etaiOverEtat);
 
 #endif
