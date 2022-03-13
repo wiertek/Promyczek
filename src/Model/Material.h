@@ -3,8 +3,7 @@
 
 #include "../Math/Ray.h"
 #include "../Math/Vec3.h"
-
-struct HitEvent;
+#include "Hittable.h"
 
 class Material {
   public:
@@ -19,7 +18,7 @@ class Lambertian : public Material {
                          const HitEvent& hitEvent,
                          Color& attenuation,
                          Ray& scattered) const override {
-        auto scatterDirection = unitVector(randomInHemisphere(hitEvent.normal));
+        auto scatterDirection = hitEvent.normal + randomUnitVector();
 
         if (scatterDirection.isNearZero()) {
             scatterDirection = hitEvent.normal;

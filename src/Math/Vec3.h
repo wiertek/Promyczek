@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "../Common.h"
+#include "Utils.h"
 
 class Vec3 {
   public:

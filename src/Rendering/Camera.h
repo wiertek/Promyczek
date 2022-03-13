@@ -1,10 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "../Common.h"
 #include "../Math/Ray.h"
+#include "../Math/Utils.h"
 #include "../Math/Vec3.h"
 
+/*
+  Contains information about camera position, orientation, defocus blur etc...
+
+  Casts ray from camera to given "pixel"
+*/
 class Camera {
   private:
     const double focalLength{1.0};
