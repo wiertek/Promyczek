@@ -123,6 +123,7 @@ inline Vec3 unitVector(Vec3 v) {
 Vec3 randomInUnitSphere();
 Vec3 randomUnitVector();
 Vec3 randomInHemisphere(const Vec3& normal);
+Vec3 randomInUnitDisk();
 Vec3 reflect(const Vec3& v, const Vec3& n);
 Vec3 refract(const Vec3& uv, const Vec3& n, double etaiOverEtat);
 

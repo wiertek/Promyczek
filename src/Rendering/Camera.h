@@ -5,31 +5,47 @@
 #include "../Math/Ray.h"
 #include "../Math/Vec3.h"
 
-class camera {
+class Camera {
+  private:
+    const double focalLength{1.0};
+
   public:
-    camera(double verticalFov, // vertical field-of-view in degrees
-           double aspectRatio) {
+    Camera(Point3 lookFrom,
+           Point3 lookAt,
+           Vec3 vecUp,
+           double verticalFov,
+           double aspectRatio,
+           double aperture,
+           double focusDist) {
         auto theta = degreesToRadians(verticalFov);
         auto h = tan(theta / 2);
         auto viewportHeight = 2.0 * h;
-        auto viewportHeight = aspectRatio * viewportHeight;
+        auto viewportWidth = aspectRatio * viewportHeight;
 
-        auto focalLength = 1.0;
-        origin = Point3(0, 0, 0);
-        horizontal = Vec3(viewportHeight, 0.0, 0.0);
-        vertical = Vec3(0.0, viewportHeight, 0.0);
-        lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focalLength);
+        _w = unitVector(lookFrom - lookAt);
+        _u = unitVector(cross(vecUp, _w));
+        _v = cross(_w, _u);
+
+        _origin = lookFrom;
+        _horizontal = focusDist * viewportWidth * _u;
+        _vertical = focusDist * viewportHeight * _v;
+        _lowerLeftCorner = _origin - (_horizontal / 2) - (_vertical / 2) - (focusDist * _w);
+        _lensRadius = aperture / 2;
     }
 
     Ray getRay(double u, double v) const {
-        return Ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+        Vec3 rd = _lensRadius * randomInUnitDisk();
+        Vec3 offset = _u * rd.x() + _v * rd.y();
+        return Ray(_origin + offset, _lowerLeftCorner + (u * _horizontal) + (v * _vertical) - _origin - offset);
     }
 
   private:
-    Point3 origin;
-    Point3 lowerLeftCorner;
-    Vec3 horizontal;
-    Vec3 vertical;
+    Point3 _origin;
+    Point3 _lowerLeftCorner;
+    Vec3 _horizontal;
+    Vec3 _vertical;
+    Vec3 _w, _u, _v; // vectors from camera position
+    double _lensRadius;
 };
 
 #endif

@@ -23,6 +23,15 @@ Vec3 randomInHemisphere(const Vec3& normal) {
         return -inUnitSphere;
 }
 
+Vec3 randomInUnitDisk() {
+    while (true) {
+        auto p = Vec3(randomDouble(-1, 1), randomDouble(-1, 1), 0);
+        if (p.lengthSquared() >= 1)
+            continue;
+        return p;
+    }
+}
+
 Vec3 reflect(const Vec3& v, const Vec3& n) {
     return v - 2 * dot(v, n) * n;
 }
