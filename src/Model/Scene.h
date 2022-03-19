@@ -2,21 +2,21 @@
 #define SCENE_H
 
 #include "../Rendering/Camera.h"
-#include "HittableList.h"
+#include "World.h"
 
 class Scene {
   public:
-    Scene(Camera camera, HittableList world) : _camera{camera}, _world{world} {}
+    Scene(Camera camera, World world) : _camera{camera}, _world{world} {}
     const Camera& getCamera() const {
         return _camera;
     }
-    const HittableList& getWorld() const {
+    const World& getWorld() const {
         return _world;
     }
 
   private:
     Camera _camera;
-    HittableList _world;
+    World _world;
 };
 
 #endif

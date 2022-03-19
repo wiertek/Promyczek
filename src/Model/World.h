@@ -1,15 +1,15 @@
-#ifndef HITTABLE_LIST_H
-#define HITTABLE_LIST_H
+#ifndef WORLD_H
+#define WORLD_H
 
 #include "Hittable.h"
 
 #include <memory>
 #include <vector>
 
-class HittableList : public Hittable {
+class World {
   public:
-    HittableList() {}
-    HittableList(std::shared_ptr<Hittable> object) {
+    World() {}
+    World(std::shared_ptr<Hittable> object) {
         add(object);
     }
 
@@ -20,7 +20,7 @@ class HittableList : public Hittable {
         objects.push_back(object);
     }
 
-    virtual bool hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const override;
+    bool hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const;
 
   public:
     std::vector<std::shared_ptr<Hittable>> objects;

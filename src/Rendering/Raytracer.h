@@ -10,7 +10,7 @@
 struct RaytracerSettings {
     int imageWidth{1600};
     int imageHeight{900};
-    bool antialiasingEnabled = true;
+    bool antialiasingEnabled = false;
     int antialiasSamplesPerPixel{500};
     int maxRayDepth{50};
     double gammaCorrection{2.0};
@@ -23,7 +23,7 @@ class Raytracer {
     void renderScene(const Scene& scene, const std::string& outputFile);
 
   private:
-    Color shadeRay(const Ray& ray, const Hittable& world, int depth);
+    Color shadeRay(const Ray& ray, const World& world, int depth);
     RaytracerSettings _settings;
 };
 

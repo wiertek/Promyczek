@@ -7,7 +7,7 @@
 #include "../Model/Material.h"
 #include "Raytracer.h"
 
-Color Raytracer::shadeRay(const Ray& ray, const Hittable& world, int depth) {
+Color Raytracer::shadeRay(const Ray& ray, const World& world, int depth) {
     if (depth <= 0) {
         return Color(0, 0, 0);
     }

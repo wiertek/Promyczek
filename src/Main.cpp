@@ -9,10 +9,10 @@
 #include "Math/Utils.h"
 #include "Math/Vec3.h"
 #include "Model/Hittable.h"
-#include "Model/HittableList.h"
 #include "Model/Material.h"
 #include "Model/Scene.h"
 #include "Model/Sphere.h"
+#include "Model/World.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Raytracer.h"
 #include "Viewer/Viewer.h"
@@ -26,7 +26,7 @@ Scene generateScene(const RaytracerSettings& settings) {
     auto aperture = 0.1;
     Camera camera(lookFrom, lookAt, vup, settings.verticalFovDegrees, aspectRatio, aperture, distToFocus);
 
-    HittableList world;
+    World world;
     auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
     world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
     for (int a = -11; a < 11; a++) {

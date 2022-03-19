@@ -1,6 +1,6 @@
-#include "HittableList.h"
+#include "World.h"
 
-bool HittableList::hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const {
+bool World::hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const {
     HitEvent tempHitEvent;
     bool hitAnything = false;
     auto closestSoFar = tMax;
