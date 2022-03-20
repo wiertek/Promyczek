@@ -11,13 +11,13 @@ class Vec3 {
     Vec3() : e{0, 0, 0} {}
     Vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
 
-    double x() const {
+    double& x() {
         return e[0];
     }
-    double y() const {
+    double& y() {
         return e[1];
     }
-    double z() const {
+    double& z() {
         return e[2];
     }
 
@@ -69,6 +69,20 @@ class Vec3 {
 
     static Vec3 random(double min, double max) {
         return Vec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
+    }
+
+    static Vec3 randomDelicateColor() {
+        Vec3 white(1.0, 1.0, 1.0);
+        auto delicateComponent = randomDouble(0.5, 1.0);
+        auto which = randomDouble();
+        if (which < 0.33) {
+            white.x() = delicateComponent;
+        } else if (which < 0.66) {
+            white.y() = delicateComponent;
+        } else {
+            white.z() = delicateComponent;
+        }
+        return white;
     }
 
   public:

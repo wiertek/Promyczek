@@ -1,13 +1,13 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "../Math/Ray.h"
-#include "../Math/Vec3.h"
-#include "Hittable.h"
+#include "../../Math/Ray.h"
+#include "../../Math/Vec3.h"
+#include "../Primitives/Collision.h"
 
 class Material {
   public:
-    virtual bool scatter(const Ray& inRay, const HitEvent& hitEvent, Color& attenuation, Ray& scattered) const = 0;
+    virtual bool scatter(const Ray& inRay, const Collision& hitEvent, Color& attenuation, Ray& scattered) const = 0;
 };
 
 class Lambertian : public Material {
@@ -15,7 +15,7 @@ class Lambertian : public Material {
     Lambertian(const Color& color) : _albedo(color) {}
 
     virtual bool scatter(const Ray& inRay,
-                         const HitEvent& hitEvent,
+                         const Collision& hitEvent,
                          Color& attenuation,
                          Ray& scattered) const override {
         auto scatterDirection = hitEvent.normal + randomUnitVector();
@@ -38,7 +38,7 @@ class Metal : public Material {
     Metal(const Color& color, double fuzz) : _albedo(color), _fuzz(fuzz) {}
 
     virtual bool scatter(const Ray& inRay,
-                         const HitEvent& hitEvent,
+                         const Collision& hitEvent,
                          Color& attenuation,
                          Ray& scattered) const override {
         Vec3 directionReflected = reflect(unitVector(inRay.direction()), hitEvent.normal);
@@ -57,7 +57,7 @@ class Dielectric : public Material {
     Dielectric(double refractionIndex) : _refractionIndex(refractionIndex) {}
 
     virtual bool scatter(const Ray& inRay,
-                         const HitEvent& hitEvent,
+                         const Collision& hitEvent,
                          Color& attenuation,
                          Ray& scattered) const override {
         attenuation = Color(1.0, 1.0, 1.0);

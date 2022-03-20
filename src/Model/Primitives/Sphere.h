@@ -2,18 +2,19 @@
 #define SPHERE_H
 
 #include <memory>
+#include <optional>
 
-#include "../Math/Vec3.h"
-#include "Hittable.h"
-#include "Material.h"
+#include "../../Math/Vec3.h"
+#include "../Materials/Material.h"
+#include "Collision.h"
 
-class Sphere : public Hittable {
+class Sphere : public Primitive {
   public:
     Sphere() {}
     Sphere(Point3 center, double radius, std::shared_ptr<Material> material)
         : _center{center}, _radius{radius}, _material{material} {};
 
-    virtual bool hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const override;
+    virtual std::optional<Collision> hit(const Ray& ray, double tMin, double tMax) const override;
 
   private:
     Point3 _center;

@@ -4,7 +4,7 @@
 #include "stb_image_write.h"
 
 #include "../Image.h"
-#include "../Model/Material.h"
+#include "../Model/Materials/Material.h"
 #include "Raytracer.h"
 
 Color Raytracer::shadeRay(const Ray& ray, const World& world, int depth) {
@@ -12,12 +12,10 @@ Color Raytracer::shadeRay(const Ray& ray, const World& world, int depth) {
         return Color(0, 0, 0);
     }
 
-    HitEvent hitEvent;
-    if (world.hit(ray, 0.001, Consts::Infinity, hitEvent)) {
-
+    if (auto hitEvent = world.hit(ray, 0.001, Consts::Infinity); hitEvent) {
         Ray scattered;
         Color attenuation;
-        if (hitEvent.material->scatter(ray, hitEvent, attenuation, scattered)) {
+        if (hitEvent->material->scatter(ray, hitEvent.value(), attenuation, scattered)) {
             return attenuation * shadeRay(scattered, world, depth - 1);
         }
         return Color(0, 0, 0);
@@ -34,10 +32,7 @@ void Raytracer::renderScene(const Scene& scene, const std::string& outputFile) {
     for (int row = _settings.imageHeight - 1; row >= 0; row--) {
         std::cout << "Rows remaining: " << row << std::endl;
         for (int col = 0; col < _settings.imageWidth; col++) {
-            auto samplesCount = _settings.antialiasSamplesPerPixel;
-            if (!_settings.antialiasingEnabled) {
-                samplesCount = 1;
-            }
+            auto samplesCount = _settings.samplesPerPixel;
             Color accumulatedPixelColor(0.0, 0.0, 0.0);
             for (auto i{0}; i < samplesCount; i++) {
                 auto u = double(col + randomDouble()) / (_settings.imageWidth - 1);  // col in <0,1> range

@@ -1,14 +1,15 @@
 #include "Sphere.h"
 
-bool Sphere::hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) const {
+std::optional<Collision> Sphere::hit(const Ray& ray, double tMin, double tMax) const {
     Vec3 oc = ray.origin() - _center;
     auto a = ray.direction().lengthSquared();
     auto half_b = dot(oc, ray.direction());
     auto c = oc.lengthSquared() - _radius * _radius;
 
     auto discriminant = half_b * half_b - a * c;
-    if (discriminant < 0)
-        return false;
+    if (discriminant < 0) {
+        return std::nullopt;
+    }
     auto sqrtd = sqrt(discriminant);
 
     // Find the nearest root that lies in the acceptable range.
@@ -16,14 +17,15 @@ bool Sphere::hit(const Ray& ray, double tMin, double tMax, HitEvent& hitEvent) c
     if (root < tMin || tMax < root) {
         root = (-half_b + sqrtd) / a;
         if (root < tMin || tMax < root) {
-            return false;
+            return std::nullopt;
         }
     }
-    hitEvent.t = root;
-    hitEvent.point = ray.at(hitEvent.t);
-    hitEvent.normal = (hitEvent.point - _center) / _radius;
-    hitEvent.material = _material;
-    Vec3 outwardNormal = (hitEvent.point - _center) / _radius;
-    hitEvent.setFaceNormal(ray, outwardNormal);
-    return true;
+    auto t = root;
+    auto point = ray.at(t);
+    auto normal = (point - _center) / _radius;
+    Vec3 outwardNormal = (point - _center) / _radius;
+    auto frontFace = dot(ray.direction(), outwardNormal) < 0;
+    normal = frontFace ? outwardNormal : -outwardNormal;
+
+    return Collision(point, normal, t, frontFace, _material);
 }

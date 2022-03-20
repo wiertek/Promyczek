@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -8,23 +9,36 @@
 #include "Math/Ray.h"
 #include "Math/Utils.h"
 #include "Math/Vec3.h"
-#include "Model/Hittable.h"
-#include "Model/Material.h"
+#include "Model/Materials/Material.h"
+#include "Model/Primitives/Collision.h"
+#include "Model/Primitives/Sphere.h"
 #include "Model/Scene.h"
-#include "Model/Sphere.h"
 #include "Model/World.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Raytracer.h"
 #include "Viewer/Viewer.h"
 
-Scene generateScene(const RaytracerSettings& settings) {
-    const auto aspectRatio = static_cast<double>(settings.imageWidth) / settings.imageHeight;
-    Point3 lookFrom(13, 2, 3);
-    Point3 lookAt(0, 0, 0);
-    Vec3 vup(0, 1, 0);
-    auto distToFocus = 10;
-    auto aperture = 0.1;
-    Camera camera(lookFrom, lookAt, vup, settings.verticalFovDegrees, aspectRatio, aperture, distToFocus);
+namespace {
+CameraSettings cameraSettings{
+    .lookFrom = Point3(13, 2, 3),
+    .lookAt = Point3(0, 0, 0),
+    .vecUp = Vec3(0, 1, 0),
+    .verticalFov = 15.0,
+};
+
+RaytracerSettings raytracerSettings{
+    .imageWidth = 1600,
+    .imageHeight = 900,
+    .maxRayDepth = 50,
+    .gammaCorrection = 2.0,
+    .samplesPerPixel = 100,
+};
+
+} // namespace
+
+Scene generateScene(int imageWidth, int imageHeight) {
+    cameraSettings.aspectRatio = static_cast<double>(imageWidth) / imageHeight;
+    Camera camera(cameraSettings);
 
     World world;
     auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
@@ -40,12 +54,14 @@ Scene generateScene(const RaytracerSettings& settings) {
                 if (choose_mat < 0.8) {
                     // diffuse
                     auto albedo = Color::random() * Color::random();
-                    sphere_material = std::make_shared<Lambertian>(albedo);
-                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                    albedo = Color::randomDelicateColor();
+                    sphere_material = std::make_shared<Metal>(albedo, 0.0);
+                    world.add(make_shared<Sphere>(center, 0.5, sphere_material));
                 } else if (choose_mat < 0.95) {
                     // Metal
                     auto albedo = Color::random(0.5, 1);
                     auto fuzz = randomDouble(0, 0.5);
+                    albedo = Color(1, 1, 1);
                     sphere_material = std::make_shared<Metal>(albedo, fuzz);
                     world.add(make_shared<Sphere>(center, 0.2, sphere_material));
                 } else {
@@ -73,12 +89,19 @@ int main(int argc, char* argv[]) {
     std::cout << "Świeć promyczku świeć!" << std::endl;
 
     auto imagePath = "/home/piotr/repos/Promyczek/renders/test.png";
-    RaytracerSettings settings;
-    auto scene = generateScene(settings);
+    if (argc == 2) {
+        auto samplesPerPixel = std::atoi(argv[1]);
+        if (samplesPerPixel == 0) {
+            raytracerSettings.samplesPerPixel = 1;
+        } else {
+            raytracerSettings.samplesPerPixel = samplesPerPixel;
+        }
+    }
+    auto scene = generateScene(raytracerSettings.imageWidth, raytracerSettings.imageHeight);
 
-    Raytracer raytracer(settings);
+    Raytracer raytracer(raytracerSettings);
     raytracer.renderScene(scene, imagePath);
-    Viewer(imagePath, settings.imageWidth, settings.imageHeight).run();
+    Viewer(imagePath, raytracerSettings.imageWidth, raytracerSettings.imageHeight).run();
 
     return EXIT_SUCCESS;
 }

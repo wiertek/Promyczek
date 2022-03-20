@@ -8,13 +8,11 @@
 #include "../Model/Scene.h"
 
 struct RaytracerSettings {
-    int imageWidth{1600};
-    int imageHeight{900};
-    bool antialiasingEnabled = false;
-    int antialiasSamplesPerPixel{500};
-    int maxRayDepth{50};
-    double gammaCorrection{2.0};
-    double verticalFovDegrees{20.0};
+    int imageWidth;
+    int imageHeight;
+    int maxRayDepth;
+    double gammaCorrection;
+    int samplesPerPixel;
 };
 
 class Raytracer {
