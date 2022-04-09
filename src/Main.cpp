@@ -23,7 +23,7 @@ CameraSettings cameraSettings{
     .lookFrom = Point3(13, 2, 3),
     .lookAt = Point3(0, 0, 0),
     .vecUp = Vec3(0, 1, 0),
-    .verticalFov = 15.0,
+    .verticalFov = 45.0,
 };
 
 RaytracerSettings raytracerSettings{
@@ -31,7 +31,7 @@ RaytracerSettings raytracerSettings{
     .imageHeight = 900,
     .maxRayDepth = 50,
     .gammaCorrection = 2.0,
-    .samplesPerPixel = 100,
+    .samplesPerPixel = 10,
 };
 
 } // namespace
